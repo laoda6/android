@@ -1,0 +1,78 @@
+/* 全局样式 */
+
+:root {
+  /* 覆盖 Vant 主题主色为品牌蓝紫色 */
+  --van-primary-color: #5b7cfa;
+  --brand: #5b7cfa;
+  --brand-2: #7c5bfa;
+  --page-bg: #f3f4f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', Roboto, sans-serif;
+  color: #1f2330;
+  background: var(--page-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 用 480px 容器模拟手机屏幕，桌面端居中显示 */
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: var(--page-bg);
+  overflow-x: hidden;
+}
+
+/* 页面通用容器；带底部 TabBar 的页面预留高度 */
+.page {
+  min-height: 100vh;
+}
+.page--tab {
+  padding-bottom: 66px;
+}
+
+/* 渐变标题栏 */
+.gradient-header {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  color: #fff;
+  padding: 20px 18px 22px;
+}
+
+/* 通用白色卡片 */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(31, 35, 48, 0.06);
+}
+
+/* 区块标题 */
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2330;
+  margin: 16px 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.muted {
+  color: #8a8fa3;
+}
+
+.text-center {
+  text-align: center;
+}

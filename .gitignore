@@ -1,0 +1,43 @@
+# ---- dependencies ----
+node_modules/
+**/node_modules/
+
+# ---- env / secrets (NEVER commit API keys) ----
+.env
+**/.env
+.env.*
+!.env.example
+*.local
+
+# ---- build outputs ----
+client/dist/
+dist/
+build/
+
+# ---- SQLite database files ----
+*.sqlite
+*.db
+server/data/*.db
+server/data/*.sqlite
+server/data/*.sqlite3
+
+# ---- Capacitor / Android build artifacts ----
+android/app/build/
+android/.gradle/
+android/build/
+android/capacitor-cordova-android-plugins/
+android/local.properties
+*.apk
+*.aab
+
+# ---- logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo

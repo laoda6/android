@@ -1,0 +1,17 @@
+{
+  "name": "ai-mock-interview-server",
+  "version": "1.0.0",
+  "description": "AI 模拟面试官 - 后端服务（Express + node:sqlite + 大模型 API）",
+  "type": "module",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/index.js",
+    "dev": "node --watch --disable-warning=ExperimentalWarning src/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

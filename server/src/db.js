@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS interviews (
   difficulty      TEXT    NOT NULL,                 -- 难度：初级/中级/高级
   total_rounds    INTEGER NOT NULL,                 -- 计划面试轮数（题数）
   jd_text         TEXT,                             -- 可选：岗位 JD 或简历文本
+  model           TEXT,                             -- 本场面试使用的大模型 id
   status          TEXT    NOT NULL DEFAULT 'ongoing', -- ongoing / finished
   current_round   INTEGER NOT NULL DEFAULT 0,       -- 当前已进行到第几轮
   total_score     INTEGER,                          -- 总分（评估后写入）
@@ -57,5 +58,11 @@ CREATE TABLE IF NOT EXISTS messages (
   FOREIGN KEY (interview_id) REFERENCES interviews(id) ON DELETE CASCADE
 );
 `);
+
+// 兼容旧数据库：若 interviews 表缺少 model 列则补充（幂等）
+const interviewCols = db.prepare('PRAGMA table_info(interviews)').all();
+if (!interviewCols.some((c) => c.name === 'model')) {
+  db.exec('ALTER TABLE interviews ADD COLUMN model TEXT');
+}
 
 console.log('📦 数据库已就绪:', dbPath);

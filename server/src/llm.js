@@ -56,11 +56,12 @@ async function callOnce(provider, messages, temperature, timeoutMs) {
 /**
  * 底层对话补全：依次尝试主用→备用，任一成功即返回。
  * @param {Array<{role:string,content:string}>} messages OpenAI 格式消息列表
- * @param {{temperature?:number}} options 采样温度
+ * @param {{temperature?:number, model?:string}} options 采样温度；model 用于覆盖主用厂商的模型
  */
-async function chat(messages, { temperature = 0.7 } = {}) {
+async function chat(messages, { temperature = 0.7, model } = {}) {
   const timeoutMs = parseInt(process.env.LLM_TIMEOUT_MS || '40000', 10);
-  const list = providers();
+  // 若调用方指定了 model，则覆盖主用厂商（火山方舟）的模型；备用厂商保持各自配置
+  const list = providers().map((p, i) => (i === 0 && model ? { ...p, model } : p));
   if (list.length === 0) throw new Error('未配置任何大模型厂商，请检查 .env');
 
   let lastError;
@@ -100,7 +101,7 @@ function interviewerSystemPrompt(position, difficulty, jdText) {
  * @param {Array<{role:string,content:string}>} history 历史对话（role 为 interviewer/candidate）
  * @returns {Promise<string>} 面试官的下一个问题
  */
-export async function generateQuestion(position, difficulty, jdText, history) {
+export async function generateQuestion(position, difficulty, jdText, history, model) {
   const messages = [
     { role: 'system', content: interviewerSystemPrompt(position, difficulty, jdText) },
   ];
@@ -115,14 +116,14 @@ export async function generateQuestion(position, difficulty, jdText, history) {
   if (history.length === 0) {
     messages.push({ role: 'user', content: '请开始面试，提出第一个问题。' });
   }
-  return chat(messages, { temperature: 0.8 });
+  return chat(messages, { temperature: 0.8, model });
 }
 
 /**
  * 面试结束后，对候选人整体表现做多维度评估，返回结构化对象
  * @returns {Promise<object>} 含 dimensions / totalScore / strengths / improvements / perQuestion / summary
  */
-export async function evaluateInterview(position, difficulty, history) {
+export async function evaluateInterview(position, difficulty, history, model) {
   // 将对话历史整理为可读的文本记录
   const transcript = history
     .map((m) => `${m.role === 'interviewer' ? '【面试官】' : '【候选人】'} ${m.content}`)
@@ -153,7 +154,7 @@ export async function evaluateInterview(position, difficulty, history) {
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
-    { temperature: 0.3 },
+    { temperature: 0.3, model },
   );
   return normalizeEvaluation(parseJsonLoose(raw));
 }

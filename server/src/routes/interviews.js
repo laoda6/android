@@ -8,6 +8,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { authRequired } from '../middleware/auth.js';
 import { generateQuestion, evaluateInterview } from '../llm.js';
+import { normalizeModel } from '../models.js';
 
 const router = Router();
 router.use(authRequired);
@@ -36,16 +37,18 @@ router.post('/', async (req, res) => {
     if (!position || !position.trim()) return res.status(400).json({ error: '请填写面试岗位' });
     // 轮数限定在 1~10 之间，防止滥用
     const rounds = Math.min(Math.max(parseInt(totalRounds, 10) || 5, 1), 10);
+    // 校验所选模型（不在白名单则回退默认）
+    const model = normalizeModel(req.body?.model);
 
     const info = db
       .prepare(
-        'INSERT INTO interviews (user_id, position, difficulty, total_rounds, jd_text, current_round) VALUES (?, ?, ?, ?, ?, 0)',
+        'INSERT INTO interviews (user_id, position, difficulty, total_rounds, jd_text, model, current_round) VALUES (?, ?, ?, ?, ?, ?, 0)',
       )
-      .run(req.user.id, position.trim(), difficulty, rounds, jdText);
+      .run(req.user.id, position.trim(), difficulty, rounds, jdText, model);
     const id = Number(info.lastInsertRowid);
 
     // 调用大模型生成第一题
-    const question = await generateQuestion(position.trim(), difficulty, jdText, []);
+    const question = await generateQuestion(position.trim(), difficulty, jdText, [], model);
     db.prepare('INSERT INTO messages (interview_id, role, content, round_no) VALUES (?, ?, ?, 1)').run(
       id,
       'interviewer',
@@ -109,9 +112,9 @@ router.post('/:id/answer', async (req, res) => {
       return res.json({ finished: true });
     }
 
-    // 否则生成下一题
+    // 否则生成下一题（沿用本场面试选定的模型）
     const history = getHistory(it.id);
-    const question = await generateQuestion(it.position, it.difficulty, it.jd_text, history);
+    const question = await generateQuestion(it.position, it.difficulty, it.jd_text, history, it.model);
     const nextRound = it.current_round + 1;
     db.prepare('INSERT INTO messages (interview_id, role, content, round_no) VALUES (?, ?, ?, ?)').run(
       it.id,
@@ -137,7 +140,7 @@ router.post('/:id/finish', async (req, res) => {
     }
 
     const history = getHistory(it.id);
-    const evaluation = await evaluateInterview(it.position, it.difficulty, history);
+    const evaluation = await evaluateInterview(it.position, it.difficulty, history, it.model);
     const total = Math.round(Number(evaluation.totalScore) || 0);
 
     db.prepare(

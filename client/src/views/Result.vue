@@ -20,6 +20,7 @@
           {{ verdict }}
         </p>
         <p class="muted result__pos">{{ interview.position }} · {{ interview.difficulty }}</p>
+        <p v-if="interview.model" class="muted result__model">🧠 {{ interview.model }}</p>
       </div>
 
       <!-- 能力雷达 -->
@@ -226,6 +227,10 @@ onMounted(async () => {
 .result__pos {
   font-size: 13px;
   margin: 0;
+}
+.result__model {
+  font-size: 12px;
+  margin: 4px 0 0;
 }
 .result__dims {
   padding: 6px 16px;

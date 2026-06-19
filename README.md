@@ -12,6 +12,8 @@
 | --- | --- |
 | 👤 用户系统 | 注册 / 登录，密码 `bcrypt` 加密入库，`JWT` 维持登录态 |
 | 🎯 创建面试 | 选择岗位方向、难度（初/中/高级）、轮数，可粘贴 JD/简历让 AI **个性化出题** |
+| 🧠 多模型可选 | 新建面试时可选择 7 个大模型（DeepSeek/MiniMax/豆包/Kimi/GLM…），按响应速度排序 |
+| 📎 简历文件解析 | 上传 **PDF / Word(.docx) / TXT** 简历，服务端自动提取文本，让 AI 据此个性化出题 |
 | 💬 多轮对话面试 | AI 面试官逐题提问，并结合上一轮回答进行**自然追问**，沉浸式聊天体验 |
 | 📊 多维智能评估 | 面试结束后大模型从**专业知识 / 逻辑表达 / 问题深度 / 沟通能力 / 综合潜力**五个维度打分 |
 | 📈 可视化报告 | 能力**雷达图**、维度评分条、逐题点评、亮点与改进建议、总体评价 |
@@ -23,7 +25,8 @@
 - **前端**：Vue 3 + Vite + Vue Router + Pinia + [Vant](https://vant-ui.github.io/vant/)（移动端 UI）+ [ECharts](https://echarts.apache.org/)（雷达图/折线图）
 - **后端**：Node.js + Express + JWT
 - **数据库**：SQLite（基于 Node.js 24 内置的 `node:sqlite`，零原生依赖）
-- **AI 大模型**：OpenAI 兼容协议接入，**火山方舟（主）+ 阿里云百炼（备）双厂商自动故障转移**
+- **AI 大模型**：OpenAI 兼容协议接入，**火山方舟（主）+ 阿里云百炼（备）双厂商自动故障转移**，支持 7 个模型按需切换
+- **简历解析**：multer（上传）+ pdf-parse / mammoth（PDF、Word 文本提取）
 - **混合打包**：Capacitor（可构建为 Android APK）
 
 ## 🏗️ 系统架构
@@ -52,8 +55,9 @@ MyProj/
 │   │   ├── index.js           # 服务入口
 │   │   ├── db.js              # 数据库连接与建表（node:sqlite）
 │   │   ├── llm.js             # 大模型调用（主备故障转移 + 评估归一化）
+│   │   ├── models.js          # 可选模型白名单（前后端单一数据源）
 │   │   ├── middleware/auth.js # JWT 鉴权中间件
-│   │   └── routes/            # auth / interviews / stats 路由
+│   │   └── routes/            # auth / interviews / stats / resume 路由
 │   ├── .env.example           # 环境变量模板（复制为 .env 填入 key）
 │   └── package.json
 ├── client/                    # 前端应用
@@ -121,6 +125,8 @@ npx cap open android   # 用 Android Studio 打开并构建 APK
 | --- | --- | --- |
 | POST | `/api/auth/register` | 注册 |
 | POST | `/api/auth/login` | 登录 |
+| GET | `/api/models` | 可选大模型清单 |
+| POST | `/api/resume/parse` | 上传并解析简历文件（PDF/Word/TXT） |
 | POST | `/api/interviews` | 创建面试并生成第一题 |
 | GET | `/api/interviews` | 面试列表 |
 | GET | `/api/interviews/:id` | 面试详情（含对话与评估） |
@@ -138,6 +144,10 @@ npx cap open android   # 用 Android Studio 打开并构建 APK
 | 多轮面试 | 评估报告 | 成长曲线 |
 | :---: | :---: | :---: |
 | ![面试](docs/screenshots/04-session.png) | ![报告](docs/screenshots/06-result-full.png) | ![我的](docs/screenshots/08-profile.png) |
+
+> 多模型选择（按响应速度排序，含厂商与全名）：
+>
+> <img src="docs/screenshots/09-model-sheet.png" width="280" />
 
 ## 🔒 关于密钥安全
 

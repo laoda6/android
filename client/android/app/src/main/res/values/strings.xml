@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AI模拟面试官</string>
+    <string name="title_activity_main">AI模拟面试官</string>
+    <string name="package_name">com.laoda6.aimockinterview</string>
+    <string name="custom_url_scheme">com.laoda6.aimockinterview</string>
+</resources>

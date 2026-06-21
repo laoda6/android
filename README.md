@@ -122,12 +122,28 @@ npm run dev
 
 ## 📱 打包为 Android（混合开发）
 
+本项目已接入 Capacitor，可将前端打包为 Android APK，打包链路完整、可成功构建：
+
 ```bash
 cd client
-npm run build          # 构建前端产物到 dist
-npx cap sync android   # 同步到 Android 工程
-npx cap open android   # 用 Android Studio 打开并构建 APK
+npm run build                          # 构建前端产物到 dist
+npx cap sync android                   # 同步到 Android 工程
+cd android && ./gradlew assembleDebug  # 生成 APK（或 npx cap open android 在 Studio 中构建）
 ```
+
+### ⚠️ 关于真机运行（当前仅支持电脑端移动仿真）
+
+本项目为**前后端分离**架构：前端（打进 APK、运行在手机 WebView 中）依赖独立的**后端服务**（Express + SQLite + 大模型代理，保存数据与 API Key）。前端通过 `/api` 访问后端，开发环境下由 Vite 代理到本机 `http://localhost:3001`。
+
+- 在**电脑浏览器的移动端视图**下运行时，`localhost` 即运行后端的本机，前后端正常连通，功能完整；
+- 但 APK 装到**手机**后，其中的 `localhost` 指向手机自身而非运行后端的电脑，**后端不可达**，因此登录、出题、评估等依赖后端的功能无法使用。
+
+因此当前演示均在**电脑端移动仿真**环境下进行。若要让 APK 在真机上完整运行，需要：
+
+1. 将后端**部署到公网可访问的服务器**（配置域名与 HTTPS）；
+2. 打包前把前端环境变量 `VITE_API_BASE` 指向该后端地址，再重新 `npm run build && npx cap sync android` 构建。
+
+考虑到课程项目不便租用公网服务器，且把大模型 API Key 暴露在公网后端存在安全顾虑，本项目暂以电脑端移动仿真演示完整功能，未提供可独立联网运行的真机 APK——**混合打包链路本身已验证可成功构建**，仅省略了后端公网部署这一步。
 
 ## 🔌 后端接口
 

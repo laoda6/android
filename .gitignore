@@ -29,8 +29,6 @@ android/capacitor-cordova-android-plugins/
 android/local.properties
 *.apk
 *.aab
-# 但保留 release/ 下手动发布的 APK
-!release/*.apk
 
 # ---- logs ----
 *.log

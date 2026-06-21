@@ -84,12 +84,22 @@ MyProj/
 
 > 前置：Node.js ≥ 22（推荐 24，内置 `node:sqlite`）。
 
-### 1. 配置后端环境变量
+### 1. 配置后端环境变量（**必做**，不能只跑 install + start）
+
+> ⚠️ 这一步**必须先做**：要新建并编辑 `server/.env` 文件填入大模型 API Key。
+> 否则注册/登录虽可用，但 **AI 出题与评估会因缺少 Key 而报错**。
 
 ```bash
 cd server
-cp .env.example .env
-# 编辑 .env，填入大模型厂商的 API Key（火山方舟 / 百炼，二选一或都填）
+cp .env.example .env        # Windows：copy .env.example .env
+```
+
+然后用编辑器打开 `server/.env`，**至少填入一个厂商的 API Key**（火山方舟或百炼，留空的会被自动跳过），并把 `JWT_SECRET` 改成任意随机串：
+
+```ini
+LLM_PRIMARY_API_KEY=你的火山方舟_API_Key
+LLM_FALLBACK_API_KEY=你的百炼_API_Key
+JWT_SECRET=任意一段随机字符串
 ```
 
 ### 2. 启动后端（默认 http://localhost:3001）
@@ -143,7 +153,7 @@ npx cap open android   # 用 Android Studio 打开并构建 APK
 
 | 多轮面试 | 评估报告 | 成长曲线 |
 | :---: | :---: | :---: |
-| ![面试](docs/screenshots/04-session.png) | ![报告](docs/screenshots/06-result-full.png) | ![我的](docs/screenshots/08-profile.png) |
+| ![多轮面试](docs/screenshots/04a-session.png)<br>![多轮面试](docs/screenshots/04b-session.png)<br>![多轮面试](docs/screenshots/04c-session.png) | ![报告](docs/screenshots/06-result-full.png) | ![我的](docs/screenshots/08-profile.png) |
 
 > 多模型选择（按响应速度排序，含厂商与全名）：
 >

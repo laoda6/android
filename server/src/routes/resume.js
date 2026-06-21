@@ -18,7 +18,8 @@ const router = Router();
 router.post('/parse', authRequired, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: '未收到文件' });
-    const name = req.file.originalname || '';
+    // multer 默认按 latin1 解析 multipart 文件名，含中文会乱码，这里转回 UTF-8
+    const name = Buffer.from(req.file.originalname || '', 'latin1').toString('utf8');
     const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
     const buf = req.file.buffer;
 
